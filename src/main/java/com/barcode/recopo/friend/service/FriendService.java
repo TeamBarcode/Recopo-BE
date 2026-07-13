@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.barcode.recopo.friend.dto.response.FriendRequestResponse;
 
 import java.util.List;
+import com.barcode.recopo.friend.dto.response.FriendResponse;
 
 @Service
 @RequiredArgsConstructor
@@ -89,6 +90,54 @@ public class FriendService {
         );
 
         friendshipRepository.save(friendship);
+    }
+
+    @Transactional
+    public void rejectFriendRequest(Long receiverId, Long requestId) {
+        Member receiver = findMember(receiverId);
+
+        FriendRequest friendRequest = friendRequestRepository
+                .findByRequestIdAndReceiver(requestId, receiver)
+                .orElseThrow(() ->
+                        new CustomException(ErrorCode.FRIEND_REQUEST_NOT_FOUND)
+                );
+
+        if (friendRequest.getStatus() != FriendRequestStatus.PENDING) {
+            throw new CustomException(
+                    ErrorCode.FRIEND_REQUEST_NOT_FOUND
+            );
+        }
+
+        friendRequest.reject();
+    }
+
+    public List<FriendResponse> getFriends(Long memberId) {
+        Member loginMember = findMember(memberId);
+
+        return friendshipRepository
+                .findAllByMemberOrFriendOrderByCreatedAtDesc(
+                        loginMember,
+                        loginMember
+                )
+                .stream()
+                .map(friendship -> {
+                    Member friend;
+
+                    if (friendship.getMember()
+                            .getMemberId()
+                            .equals(memberId)) {
+                        friend = friendship.getFriend();
+                    } else {
+                        friend = friendship.getMember();
+                    }
+
+                    return new FriendResponse(
+                            friend.getMemberId(),
+                            friend.getNickname(),
+                            friend.getProfileImageUrl()
+                    );
+                })
+                .toList();
     }
 
     private Member findMember(Long memberId){
