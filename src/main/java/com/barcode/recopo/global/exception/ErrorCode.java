@@ -18,9 +18,9 @@ public enum ErrorCode {
     MEMBER_NOT_FOUND(404, "존재하지 않는 회원입니다."),
     DUPLICATE_LOGIN_ID(409, "이미 사용중인 아이디입니다."),
     INVALID_IMAGE_TYPE(400, "jpg, jpeg, png, webp 형식의 이미지만 업로드할 수 있습니다."),
-    IMAGE_TOO_LARGE(400, "이미지 크기는 최대 5MB까지 업로드할 수 있습니다.");
+    IMAGE_TOO_LARGE(400, "이미지 크기는 최대 5MB까지 업로드할 수 있습니다."),
 
-    //friend
+    // friend
     CANNOT_REQUEST_SELF(400, "자기 자신에게 친구 신청을 보낼 수 없습니다."),
     FRIEND_REQUEST_ALREADY_EXISTS(409, "이미 대기 중인 친구 신청이 있습니다."),
     ALREADY_FRIENDS(409, "이미 친구인 회원입니다."),

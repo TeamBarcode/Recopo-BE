@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import java.util.List;
 
@@ -20,7 +21,7 @@ public class FriendController {
 
     @PostMapping("/requests")
     public ResponseEntity<Void> sendFriendRequest(
-            @RequestHeader("X-Member-Id") Long memberId,
+            @AuthenticationPrincipal Long memberId,
             @Valid @RequestBody FriendRequestCreateRequest request
     ) {
         friendService.sendFriendRequest(
@@ -36,7 +37,7 @@ public class FriendController {
     @GetMapping("/requests/received")
     public ResponseEntity<List<FriendRequestResponse>>
     getReceivedRequests(
-            @RequestHeader("X-Member-Id") Long memberId
+            @AuthenticationPrincipal Long memberId
     ) {
         return ResponseEntity.ok(
                 friendService.getReceivedRequests(memberId)
@@ -45,7 +46,7 @@ public class FriendController {
 
     @PatchMapping("/requests/{requestId}/accept")
     public ResponseEntity<Void> acceptFriendRequest(
-            @RequestHeader("X-Member-Id") Long memberId,
+            @AuthenticationPrincipal Long memberId,
             @PathVariable Long requestId
     ) {
         friendService.acceptFriendRequest(memberId, requestId);
@@ -55,7 +56,7 @@ public class FriendController {
 
     @PatchMapping("/requests/{requestId}/reject")
     public ResponseEntity<Void> rejectFriendRequest(
-            @RequestHeader("X-Member-Id") Long memberId,
+            @AuthenticationPrincipal Long memberId,
             @PathVariable Long requestId
     ) {
         friendService.rejectFriendRequest(memberId, requestId);
@@ -65,7 +66,7 @@ public class FriendController {
 
     @GetMapping
     public ResponseEntity<List<FriendResponse>> getFriends(
-            @RequestHeader("X-Member-Id") Long memberId
+            @AuthenticationPrincipal Long memberId
     ) {
         return ResponseEntity.ok(
                 friendService.getFriends(memberId)
