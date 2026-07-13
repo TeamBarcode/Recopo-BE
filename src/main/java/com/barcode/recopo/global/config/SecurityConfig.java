@@ -28,7 +28,8 @@ public class SecurityConfig {
 
     private static final String[] PUBLIC_URLS = {
             "/api/auth/**",
-            "/actuator/health"
+            "/actuator/health",
+            "/api/cards/**"
     };
 
     @Bean
