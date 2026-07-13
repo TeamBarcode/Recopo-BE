@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -39,6 +40,18 @@ public class GlobalExceptionHandler {
                 400,
                 "INVALID_INPUT",
                 errorMessage,
+                request.getRequestURI()
+        );
+        return new ResponseEntity<>(errorDto, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    protected ResponseEntity<ErrorDto> handleMissingParameterException(MissingServletRequestParameterException e, HttpServletRequest request) {
+        ErrorDto errorDto = new ErrorDto(
+                LocalDateTime.now().toString(),
+                400,
+                "INVALID_INPUT",
+                e.getParameterName() + "는 필수입니다.",
                 request.getRequestURI()
         );
         return new ResponseEntity<>(errorDto, HttpStatus.BAD_REQUEST);

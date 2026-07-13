@@ -2,15 +2,15 @@ package com.barcode.recopo.global.config;
 
 import com.barcode.recopo.global.exception.handler.CustomAccessDeniedHandler;
 import com.barcode.recopo.global.exception.handler.CustomAuthenticationEntryPoint;
+import com.barcode.recopo.global.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -25,10 +25,14 @@ public class SecurityConfig {
 
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
     private final CustomAccessDeniedHandler accessDeniedHandler;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     private static final String[] PUBLIC_URLS = {
-            "/api/auth/**",
+            "/auth/login/google",
+            "/auth/token/refresh",
             "/actuator/health",
+            "/uploads/**",
+            "/api/auth/**",
             "/api/cards/**"
     };
 
@@ -48,15 +52,9 @@ public class SecurityConfig {
                         .authenticationEntryPoint(authenticationEntryPoint)
                         .accessDeniedHandler(accessDeniedHandler));
 
-        // TODO: JWT filter 만들면 여기에 추가
-        // http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 
     @Bean
