@@ -31,7 +31,9 @@ public class SecurityConfig {
             "/auth/login/google",
             "/auth/token/refresh",
             "/actuator/health",
-            "/uploads/**"
+            "/uploads/**",
+            "/api/auth/**",
+            "/api/cards/**"
     };
 
     @Bean
