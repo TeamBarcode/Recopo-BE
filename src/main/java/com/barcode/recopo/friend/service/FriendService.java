@@ -34,11 +34,19 @@ public class FriendService {
         }
         Member requester=findMember(requesterId);
         Member receiver = findMember(receiverId);
+
         if (isAlreadyFriends(requester, receiver)){
+            throw new CustomException(
+                    ErrorCode.ALREADY_FRIENDS
+            );
+        }
+
+        if (hasPendingRequest(requester, receiver)) {
             throw new CustomException(
                     ErrorCode.FRIEND_REQUEST_ALREADY_EXISTS
             );
         }
+
         FriendRequest friendRequest =
                 FriendRequest.create(requester, receiver);
         friendRequestRepository.save(friendRequest);

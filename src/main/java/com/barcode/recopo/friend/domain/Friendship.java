@@ -22,6 +22,10 @@ public class Friendship {
     @Column(name="created_at", nullable=false, updatable=false)
     private LocalDateTime createdAt;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
+
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="friend_id", nullable=false)
     private Member friend;
