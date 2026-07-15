@@ -22,6 +22,7 @@ public class CardService {
 
     private final CardRepository cardRepository;
     private final MemberRepository memberRepository;
+
     @Transactional
     public CardResponseDto createCard(Long memberId, CardRequestDto requestDto) {
         String extractedHashtags = extractHashtags(requestDto.content());
@@ -45,6 +46,7 @@ public class CardService {
                 savedCard.getTitle(),
                 savedCard.getContent(),
                 savedCard.getHashtag(),
+                savedCard.getCategory(),
                 savedCard.getCreatedAt(),
                 savedCard.getUpdatedAt()
         );
@@ -58,6 +60,7 @@ public class CardService {
                         card.getTitle(),
                         card.getContent(),
                         card.getHashtag(),
+                        card.getCategory(),
                         card.getCreatedAt(),
                         card.getUpdatedAt()))
                 .collect(Collectors.toList());
@@ -73,12 +76,12 @@ public class CardService {
                 card.getTitle(),
                 card.getContent(),
                 card.getHashtag(),
+                card.getCategory(),
                 card.getCreatedAt(),
                 card.getUpdatedAt()
         );
     }
 
-    // 본문에서 #으로 시작하는 단어를 찾아 중복 없이 쉼표로 연결하는 메서드
     private String extractHashtags(String content) {
         if (content == null || content.isEmpty()) return "";
 
