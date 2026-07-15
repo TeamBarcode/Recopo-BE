@@ -4,6 +4,9 @@ import com.barcode.recopo.card.dto.CardRequestDto;
 import com.barcode.recopo.card.dto.CardResponseDto;
 import com.barcode.recopo.card.service.CardService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,16 +17,28 @@ import java.util.List;
 public class CardController {
 
     private final CardService cardService;
+
     @PostMapping
-    public CardResponseDto createCard(@RequestBody CardRequestDto requestDto) {
-        return cardService.createCard(requestDto);
+    public ResponseEntity<CardResponseDto> createCard(
+            @AuthenticationPrincipal Long memberId,
+            @RequestBody CardRequestDto requestDto
+    ) {
+        CardResponseDto response = cardService.createCard(memberId, requestDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
     @GetMapping
-    public List<CardResponseDto> getAllCards() {
-        return cardService.getAllCards();
+    public ResponseEntity<List<CardResponseDto>> getAllCards(
+            @AuthenticationPrincipal Long memberId
+    ) {
+        return ResponseEntity.ok(cardService.getAllCards(memberId));
     }
+
     @GetMapping("/{cardId}")
-    public CardResponseDto getCardById(@PathVariable Long cardId) {
-        return cardService.getCardById(cardId);
+    public ResponseEntity<CardResponseDto> getCardById(
+            @AuthenticationPrincipal Long memberId,
+            @PathVariable Long cardId
+    ) {
+        return ResponseEntity.ok(cardService.getCardById(cardId));
     }
 }
