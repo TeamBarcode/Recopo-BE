@@ -40,7 +40,6 @@ public class Card {
         this.title = title;
         this.content = content;
         this.category = category;
-        this.hashtag = hashtag;
         this.member = member;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
