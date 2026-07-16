@@ -39,6 +39,7 @@ public class CardController {
             @AuthenticationPrincipal Long memberId,
             @PathVariable Long cardId
     ) {
-        return ResponseEntity.ok(cardService.getCardById(cardId));
+        // memberId를 서비스에 전달하여 "나의 카드"인지 검증하게 함
+        return ResponseEntity.ok(cardService.getCardById(memberId, cardId));
     }
 }

@@ -4,6 +4,8 @@ import com.barcode.recopo.card.domain.Card;
 import com.barcode.recopo.card.dto.CardRequestDto;
 import com.barcode.recopo.card.dto.CardResponseDto;
 import com.barcode.recopo.card.repository.CardRepository;
+import com.barcode.recopo.global.exception.CustomException;
+import com.barcode.recopo.global.exception.ErrorCode;
 import com.barcode.recopo.member.domain.Member;
 import com.barcode.recopo.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -66,9 +68,14 @@ public class CardService {
                 .collect(Collectors.toList());
     }
 
-    public CardResponseDto getCardById(Long cardId) {
+    public CardResponseDto getCardById(Long memberId, Long cardId) {
         Card card = cardRepository.findById(cardId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 카드를 찾을 수 없습니다. ID: " + cardId));
+                .orElseThrow(() -> new CustomException(ErrorCode.CARD_NOT_FOUND));
+
+        // 2. 카드는 있는데, 내 카드가 아닌 경우
+        if (!card.getMember().getMemberId().equals(memberId)) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED_CARD_ACCESS);
+        }
 
         return new CardResponseDto(
                 card.getCardId(),

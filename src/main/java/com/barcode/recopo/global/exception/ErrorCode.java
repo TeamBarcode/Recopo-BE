@@ -18,7 +18,11 @@ public enum ErrorCode {
     MEMBER_NOT_FOUND(404, "존재하지 않는 회원입니다."),
     DUPLICATE_LOGIN_ID(409, "이미 사용중인 아이디입니다."),
     INVALID_IMAGE_TYPE(400, "jpg, jpeg, png, webp 형식의 이미지만 업로드할 수 있습니다."),
-    IMAGE_TOO_LARGE(400, "이미지 크기는 최대 5MB까지 업로드할 수 있습니다.");
+    IMAGE_TOO_LARGE(400, "이미지 크기는 최대 5MB까지 업로드할 수 있습니다."),
+
+    // cards
+    CARD_NOT_FOUND(404, "해당 카드를 찾을 수 없습니다."),
+    UNAUTHORIZED_CARD_ACCESS(403, "본인의 카드만 조회할 수 있습니다.");
 
     private final int status;
     private final String message;
