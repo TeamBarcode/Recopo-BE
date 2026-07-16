@@ -53,7 +53,7 @@ public class CardService {
     }
 
     public List<CardResponseDto> getAllCards(Long memberId) {
-        return cardRepository.findAll().stream()
+        return cardRepository.findByMemberMemberId(memberId).stream()
                 .map(card -> new CardResponseDto(
                         card.getCardId(),
                         card.getMember().getMemberId(),
@@ -85,7 +85,7 @@ public class CardService {
     private String extractHashtags(String content) {
         if (content == null || content.isEmpty()) return "";
 
-        Pattern pattern = Pattern.compile("#(\\w+)");
+        Pattern pattern = Pattern.compile("#([\\w가-힣]+)");
         Matcher matcher = pattern.matcher(content);
 
         return matcher.results()
