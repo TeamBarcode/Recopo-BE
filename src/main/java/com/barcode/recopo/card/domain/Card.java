@@ -1,5 +1,6 @@
 package com.barcode.recopo.card.domain;
 
+import com.barcode.recopo.member.domain.Member;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -20,14 +21,33 @@ public class Card {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Category category;
+
+    @Column(length = 100)
+    private String hashtag;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
     @Builder
-    public Card(String title, String content) {
+    private Card(String title, String content, Category category, String hashtag, Member member) {
         this.title = title;
         this.content = content;
+        this.category = category;
+        this.hashtag = hashtag;
+        this.member = member;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
+
+    public static Card create(String title, String content, Category category, String hashtag, Member member) {
+        return new Card(title, content, category, hashtag, member);
+    }
+
 }
