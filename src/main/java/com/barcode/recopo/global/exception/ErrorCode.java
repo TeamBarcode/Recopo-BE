@@ -20,9 +20,13 @@ public enum ErrorCode {
     INVALID_IMAGE_TYPE(400, "jpg, jpeg, png, webp 형식의 이미지만 업로드할 수 있습니다."),
     IMAGE_TOO_LARGE(400, "이미지 크기는 최대 5MB까지 업로드할 수 있습니다."),
 
-    // cards
+    // card
     CARD_NOT_FOUND(404, "해당 카드를 찾을 수 없습니다."),
     UNAUTHORIZED_CARD_ACCESS(403, "본인의 카드만 조회할 수 있습니다."),
+
+    // idea
+    IDEA_NOT_FOUND(404, "해당 아이디어를 찾을 수 없습니다."),
+    UNAUTHORIZED_IDEA_ACCESS(403, "본인의 아이디어만 접근할 수 있습니다."),
 
     // friend
     CANNOT_REQUEST_SELF(400, "자기 자신에게 친구 신청을 보낼 수 없습니다."),
