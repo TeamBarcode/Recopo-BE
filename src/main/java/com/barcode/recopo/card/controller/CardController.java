@@ -1,5 +1,6 @@
 package com.barcode.recopo.card.controller;
 
+import com.barcode.recopo.card.domain.Category;
 import com.barcode.recopo.card.dto.CardRequestDto;
 import com.barcode.recopo.card.dto.CardResponseDto;
 import com.barcode.recopo.card.service.CardService;
@@ -29,9 +30,12 @@ public class CardController {
 
     @GetMapping
     public ResponseEntity<List<CardResponseDto>> getAllCards(
-            @AuthenticationPrincipal Long memberId
+            @AuthenticationPrincipal Long memberId,
+            @RequestParam(required = false) Category category,
+            @RequestParam(required = false, defaultValue = "latest") String sort
     ) {
-        return ResponseEntity.ok(cardService.getAllCards(memberId));
+        List<CardResponseDto> cards = cardService.getAllCards(memberId, category, sort);
+        return ResponseEntity.ok(cards);
     }
 
     @GetMapping("/{cardId}")
@@ -41,5 +45,23 @@ public class CardController {
     ) {
         // memberId를 서비스에 전달하여 "나의 카드"인지 검증하게 함
         return ResponseEntity.ok(cardService.getCardById(memberId, cardId));
+    }
+    @DeleteMapping("/{cardId}")
+    public ResponseEntity<Void> deleteCard(
+            @AuthenticationPrincipal Long memberId,
+            @PathVariable Long cardId
+    ) {
+        cardService.deleteCard(cardId, memberId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{cardId}")
+    public ResponseEntity<CardResponseDto> updateCard(
+            @AuthenticationPrincipal Long memberId,
+            @PathVariable Long cardId,
+            @RequestBody CardRequestDto requestDto
+    ) {
+        CardResponseDto response = cardService.updateCard(memberId, cardId, requestDto);
+        return ResponseEntity.ok(response);
     }
 }

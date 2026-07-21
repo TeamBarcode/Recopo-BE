@@ -49,5 +49,11 @@ public class Card {
     public static Card create(String title, String content, Category category, String hashtag, Member member) {
         return new Card(title, content, category, hashtag, member);
     }
-
+    public void update(String title, String content, Category category, String hashtag) {
+        this.title = title;
+        this.content = content;
+        this.category = category;
+        this.hashtag = hashtag;
+        this.updatedAt = LocalDateTime.now();
+    }
 }
