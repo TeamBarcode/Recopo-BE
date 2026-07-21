@@ -34,7 +34,10 @@ public enum ErrorCode {
     ALREADY_FRIENDS(409, "이미 친구인 회원입니다."),
     FRIEND_REQUEST_NOT_FOUND(404, "친구 요청을 찾을 수 없습니다."),
     FRIEND_REQUEST_ALREADY_PROCESSED(409, "이미 처리된 친구 요청입니다."),
-    FRIENDSHIP_NOT_FOUND(404, "친구 관계를 찾을 수 없습니다.");
+    FRIENDSHIP_NOT_FOUND(404, "친구 관계를 찾을 수 없습니다."),
+
+    //Notification
+    NOTIFICATION_NOT_FOUND(404, "알림을 찾을 수 없습니다.");
 
     // 공통 코드 유지
     private final int status;
