@@ -56,4 +56,11 @@ public class Card {
         this.hashtag = hashtag;
         this.updatedAt = LocalDateTime.now();
     }
+    @Column(nullable = false)
+    private boolean isConverted = false; // 기본값 false (카드 상태)
+
+    // 아이디어로 전환하는 메서드
+    public void convertToIdea() {
+        this.isConverted = true;
+    }
 }

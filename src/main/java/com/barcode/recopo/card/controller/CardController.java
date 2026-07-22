@@ -32,9 +32,9 @@ public class CardController {
     public ResponseEntity<List<CardResponseDto>> getAllCards(
             @AuthenticationPrincipal Long memberId,
             @RequestParam(required = false) Category category,
-            @RequestParam(required = false, defaultValue = "latest") String sort
+            @RequestParam(value = "sortBy", required = false, defaultValue = "latest") String sortBy // 👈 'sort'를 'sortBy'로 변경
     ) {
-        List<CardResponseDto> cards = cardService.getAllCards(memberId, category, sort);
+        List<CardResponseDto> cards = cardService.getAllCards(memberId, category, sortBy);
         return ResponseEntity.ok(cards);
     }
 

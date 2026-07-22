@@ -71,11 +71,9 @@ public class CardService {
 
         List<Card> cards;
         if (category == null) {
-            // 카테고리가 없으면 전체 조회
-            cards = cardRepository.findByMemberMemberId(memberId, sort);
+            cards = cardRepository.findByMemberMemberIdAndIsConvertedFalse(memberId, sort);
         } else {
-            // 카테고리가 있으면 해당 카테고리만 조회
-            cards = cardRepository.findByMemberMemberIdAndCategory(memberId, category, sort);
+            cards = cardRepository.findByMemberMemberIdAndCategoryAndIsConvertedFalse(memberId, category, sort);
         }
         return cards.stream()
                 .map(this::convertToDto)
@@ -111,6 +109,10 @@ public class CardService {
         if (!card.getMember().getMemberId().equals(memberId)) {
             throw new CustomException(ErrorCode.UNAUTHORIZED_CARD_ACCESS);
         }
+        if (card.isConverted()) {
+            throw new CustomException(ErrorCode.CANNOT_DELETE_CONVERTED_CARD);
+        }
+
         cardRepository.delete(card);
     }
     @Transactional

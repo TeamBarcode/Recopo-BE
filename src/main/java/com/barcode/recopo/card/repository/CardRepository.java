@@ -14,7 +14,8 @@ public interface CardRepository extends JpaRepository<Card, Long> {
     List<Card> findByMemberMemberId(Long memberId);
     List<Card> findByMemberMemberId(Long memberId, Sort sort);
     List<Card> findByMemberMemberIdAndCategory(Long member_memberId, Category category, Sort sort);
-
+    List<Card> findByMemberMemberIdAndIsConvertedFalse(Long memberId, Sort sort);
+    List<Card> findByMemberMemberIdAndCategoryAndIsConvertedFalse(Long memberId, Category category, Sort sort);
     List<Card> findByHashtagContaining(String hashtag);
 
     Optional<Card> findByCardIdAndMember_MemberId(Long cardId, Long memberId);
