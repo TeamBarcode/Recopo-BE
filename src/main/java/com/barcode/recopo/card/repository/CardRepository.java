@@ -19,4 +19,7 @@ public interface CardRepository extends JpaRepository<Card, Long> {
     List<Card> findByHashtagContaining(String hashtag);
 
     Optional<Card> findByCardIdAndMember_MemberId(Long cardId, Long memberId);
+
+    // 회원이 작성한 카드 개수 조회 (마이페이지용)
+    long countByMemberMemberId(Long memberId);
 }
