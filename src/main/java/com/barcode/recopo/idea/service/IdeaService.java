@@ -29,9 +29,13 @@ public class IdeaService {
         if (!card.getMember().getMemberId().equals(memberId)) {
             throw new CustomException(ErrorCode.UNAUTHORIZED_CARD_ACCESS);
         }
-
+        if (card.isConverted()) {
+            throw new CustomException(ErrorCode.ALREADY_CONVERTED_CARD);
+        }
         Idea idea = Idea.create(card);
         ideaRepository.save(idea);
+
+        card.convertToIdea();
     }
     public List<IdeaResponseDto> findAllIdeas(Long memberId) {
         return ideaRepository.findAllByMember_MemberId(memberId).stream()
