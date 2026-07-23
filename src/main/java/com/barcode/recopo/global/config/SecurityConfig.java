@@ -28,11 +28,10 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     private static final String[] PUBLIC_URLS = {
-            "/auth/login/google",
-            "/auth/token/refresh",
+            "/api/auth/login/google",
+            "/api/auth/token/refresh",
             "/actuator/health",
-            "/uploads/**",
-            "/api/auth/**"
+            "/uploads/**"
     };
 
     @Bean

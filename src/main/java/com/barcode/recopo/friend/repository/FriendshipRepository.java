@@ -24,4 +24,8 @@ public interface FriendshipRepository
             Member member,
             Member friend
     );
+
+    // 회원 탈퇴 시 본인이 걸린 친구 관계 삭제 (양방향)
+    void deleteAllByMember(Member member);
+    void deleteAllByFriend(Member friend);
 }
