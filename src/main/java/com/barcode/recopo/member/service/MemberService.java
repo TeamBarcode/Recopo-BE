@@ -18,6 +18,7 @@ import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class MemberService {
 
     private static final long MAX_IMAGE_SIZE = 5 * 1024 * 1024;
@@ -78,6 +79,12 @@ public class MemberService {
         memberRepository.flush();
 
         return ProfileImageResponse.from(member);
+    }
+
+    // 다른 도메인에서 회원 조회 시 사용하는 helper method
+    public Member findMemberById(Long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
     private void validateImage(MultipartFile image) {
