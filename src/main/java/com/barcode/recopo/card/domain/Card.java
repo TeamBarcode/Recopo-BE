@@ -49,5 +49,18 @@ public class Card {
     public static Card create(String title, String content, Category category, String hashtag, Member member) {
         return new Card(title, content, category, hashtag, member);
     }
+    public void update(String title, String content, Category category, String hashtag) {
+        this.title = title;
+        this.content = content;
+        this.category = category;
+        this.hashtag = hashtag;
+        this.updatedAt = LocalDateTime.now();
+    }
+    @Column(nullable = false)
+    private boolean isConverted = false; // 기본값 false (카드 상태)
 
+    // 아이디어로 전환하는 메서드
+    public void convertToIdea() {
+        this.isConverted = true;
+    }
 }
