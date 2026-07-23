@@ -9,6 +9,10 @@ import com.barcode.recopo.global.exception.CustomException;
 import com.barcode.recopo.global.exception.ErrorCode;
 import com.barcode.recopo.member.domain.Member;
 import com.barcode.recopo.member.repository.MemberRepository;
+import com.barcode.recopo.notification.domain.Notification;
+import com.barcode.recopo.notification.domain.NotificationTargetType;
+import com.barcode.recopo.notification.domain.NotificationType;
+import com.barcode.recopo.notification.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +30,7 @@ public class FriendService {
     private final MemberRepository memberRepository;
     private final FriendRequestRepository friendRequestRepository;
     private final FriendshipRepository friendshipRepository;
+    private final NotificationRepository notificationRepository;
 
     @Transactional
     public void sendFriendRequest(Long requesterId, Long receiverId){
@@ -50,6 +55,16 @@ public class FriendService {
         FriendRequest friendRequest =
                 FriendRequest.create(requester, receiver);
         friendRequestRepository.save(friendRequest);
+
+        Notification notification=Notification.create(
+                NotificationType.FRIEND_REQUEST,
+                requester.getNickname()+"님이 친구 요청을 보냈습니다.",
+                friendRequest.getRequestId(),
+                NotificationTargetType.FRIEND_REQUEST,
+                receiver,
+                requester
+        );
+        notificationRepository.save(notification);
     }
 
     public List<FriendRequestResponse> getReceivedRequests(Long receiverId) {
@@ -98,6 +113,12 @@ public class FriendService {
         );
 
         friendshipRepository.save(friendship);
+
+        notificationRepository.deleteByReceiverAndTargetTypeAndTargetId(
+                receiver,
+                NotificationTargetType.FRIEND_REQUEST,
+                requestId
+        );
     }
 
     @Transactional
@@ -117,6 +138,11 @@ public class FriendService {
         }
 
         friendRequest.reject();
+        notificationRepository.deleteByReceiverAndTargetTypeAndTargetId(
+                receiver,
+                NotificationTargetType.FRIEND_REQUEST,
+                requestId
+        );
     }
 
     public List<FriendResponse> getFriends(Long memberId) {
