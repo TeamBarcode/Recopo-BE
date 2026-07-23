@@ -20,6 +20,7 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final MemberRepository memberRepository;
 
+    @Transactional
     public void readNotification(Long memberId, Long notificationId) {
         Member receiver = memberRepository.findById(memberId)
                 .orElseThrow(() ->
@@ -32,6 +33,7 @@ public class NotificationService {
 
         notification.markAsRead();
     }
+    @Transactional
     public void readAllNotifications(Long memberId) {
         Member receiver = memberRepository.findById(memberId)
                 .orElseThrow(() ->

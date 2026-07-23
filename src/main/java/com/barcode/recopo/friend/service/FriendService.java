@@ -113,6 +113,12 @@ public class FriendService {
         );
 
         friendshipRepository.save(friendship);
+
+        notificationRepository.deleteByReceiverAndTargetTypeAndTargetId(
+                receiver,
+                NotificationTargetType.FRIEND_REQUEST,
+                requestId
+        );
     }
 
     @Transactional
@@ -132,6 +138,11 @@ public class FriendService {
         }
 
         friendRequest.reject();
+        notificationRepository.deleteByReceiverAndTargetTypeAndTargetId(
+                receiver,
+                NotificationTargetType.FRIEND_REQUEST,
+                requestId
+        );
     }
 
     public List<FriendResponse> getFriends(Long memberId) {
