@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -40,6 +41,18 @@ public class GlobalExceptionHandler {
                 400,
                 "INVALID_INPUT",
                 errorMessage,
+                request.getRequestURI()
+        );
+        return new ResponseEntity<>(errorDto, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    protected ResponseEntity<ErrorDto> handleHttpMessageNotReadableException(HttpMessageNotReadableException e, HttpServletRequest request) {
+        ErrorDto errorDto = new ErrorDto(
+                LocalDateTime.now().toString(),
+                400,
+                "INVALID_INPUT",
+                "요청 본문을 읽을 수 없습니다.",
                 request.getRequestURI()
         );
         return new ResponseEntity<>(errorDto, HttpStatus.BAD_REQUEST);

@@ -11,9 +11,12 @@ public record MemberProfileResponse(
         String nickname,
         String profileImageUrl,
         boolean profileCompleted,
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+        long cardCount,
+        long ideaCount,
+        boolean cardColorEnabled
 ) {
-    public static MemberProfileResponse from(Member member) {
+    public static MemberProfileResponse from(Member member, long cardCount, long ideaCount) {
         return new MemberProfileResponse(
                 member.getMemberId(),
                 member.getLoginId(),
@@ -21,7 +24,10 @@ public record MemberProfileResponse(
                 member.getNickname(),
                 member.getProfileImageUrl(),
                 member.isProfileCompleted(),
-                member.getCreatedAt()
+                member.getCreatedAt(),
+                cardCount,
+                ideaCount,
+                member.isCardColorEnabled()
         );
     }
 }
