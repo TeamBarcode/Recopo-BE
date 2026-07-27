@@ -30,6 +30,9 @@ public enum ErrorCode {
     UNAUTHORIZED_IDEA_ACCESS(403, "본인의 아이디어만 접근할 수 있습니다."),
     ALREADY_CONVERTED_CARD(400, "이미 아이디어로 전환된 카드입니다."),
     CANNOT_DELETE_CONVERTED_CARD(400, "아이디어로 전환된 카드는 삭제할 수 없습니다."),
+    CANNOT_LIKE_OWN_IDEA(400, "본인의 아이디어에는 좋아요를 누를 수 없습니다."),
+    IDEA_LIKE_ALREADY_EXISTS(409, "이미 좋아요를 누른 아이디어입니다."),
+    IDEA_LIKE_NOT_FOUND(404, "좋아요 내역을 찾을 수 없습니다."),
 
     // friend
     CANNOT_REQUEST_SELF(400, "자기 자신에게 친구 신청을 보낼 수 없습니다."),
@@ -38,6 +41,10 @@ public enum ErrorCode {
     FRIEND_REQUEST_NOT_FOUND(404, "친구 요청을 찾을 수 없습니다."),
     FRIEND_REQUEST_ALREADY_PROCESSED(409, "이미 처리된 친구 요청입니다."),
     FRIENDSHIP_NOT_FOUND(404, "친구 관계를 찾을 수 없습니다."),
+
+    // comment
+    COMMENT_NOT_FOUND(404, "댓글을 찾을 수 없습니다."),
+    UNAUTHORIZED_COMMENT_ACCESS(403, "본인이 작성한 댓글만 수정하거나 삭제할 수 있습니다."),
 
     //Notification
     NOTIFICATION_NOT_FOUND(404, "알림을 찾을 수 없습니다.");

@@ -4,6 +4,7 @@ import com.barcode.recopo.member.domain.Member;
 import com.barcode.recopo.notification.domain.Notification;
 import com.barcode.recopo.notification.domain.NotificationTargetType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import com.barcode.recopo.notification.domain.NotificationType;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +23,14 @@ public interface NotificationRepository
     );
     void deleteByReceiverAndTargetTypeAndTargetId(
             Member receiver,
+            NotificationTargetType targetType,
+            Long targetId
+    );
+
+    void deleteByReceiverAndActorAndTypeAndTargetTypeAndTargetId(
+            Member receiver,
+            Member actor,
+            NotificationType type,
             NotificationTargetType targetType,
             Long targetId
     );
