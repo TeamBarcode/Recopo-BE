@@ -26,4 +26,8 @@ public interface NotificationRepository
             Long targetId
     );
 
+    // 회원 탈퇴 시 본인이 받은/발생시킨 알림 삭제
+    void deleteAllByReceiver(Member receiver);
+    void deleteAllByActor(Member actor);
+
 }
