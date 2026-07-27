@@ -25,6 +25,10 @@ public enum ErrorCode {
     // card
     CARD_NOT_FOUND(404, "해당 카드를 찾을 수 없습니다."),
     UNAUTHORIZED_CARD_ACCESS(403, "본인의 카드만 조회할 수 있습니다."),
+    TOO_MANY_HASHTAGS(400, "해시태그는 최대 5개까지만 등록할 수 있습니다."),
+    TITLE_REQUIRED(400, "제목은 필수입니다."),
+    CONTENT_REQUIRED(400, "본문은 필수입니다."),
+    CATEGORY_REQUIRED(400, "카테고리는 필수입니다."),
 
     // idea
     IDEA_NOT_FOUND(404, "해당 아이디어를 찾을 수 없습니다."),

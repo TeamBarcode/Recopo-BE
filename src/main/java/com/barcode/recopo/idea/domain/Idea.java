@@ -47,21 +47,29 @@ public class Idea {
     @Column(name = "recommendation_id") // nullable = true (기본값)
     private Long recommendationId;
 
+    @Column(nullable = false)
+    private int likeCount = 0;
     private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 
     // 정적 팩토리 메서드
-    public static Idea create(Card card) {
+    public static Idea create(Card card, Visibility visibility) {
         Idea idea = new Idea();
         idea.title = card.getTitle();
         idea.content = card.getContent();
         idea.hashtag = card.getHashtag();
         idea.category = card.getCategory();
-        idea.visibility = Visibility.PRIVATE; // 초기 상태는 비공개
+        idea.visibility = visibility;
         idea.member = card.getMember();
         idea.card = card;
+        idea.likeCount = 0;
         idea.createdAt = LocalDateTime.now();
-        idea.updatedAt = LocalDateTime.now();
         return idea;
+    }
+
+    public void update(String title, String hashtag, Category category, Visibility visibility) {
+        if (title != null) this.title = title;
+        if (hashtag != null) this.hashtag = hashtag;
+        if (category != null) this.category = category;
+        if (visibility != null) this.visibility = visibility;
     }
 }
