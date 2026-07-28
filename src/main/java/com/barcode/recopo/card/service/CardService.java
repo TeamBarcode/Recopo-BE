@@ -1,6 +1,7 @@
 package com.barcode.recopo.card.service;
 
 import com.barcode.recopo.card.domain.Card;
+import com.barcode.recopo.card.domain.CardSortBy;
 import com.barcode.recopo.card.domain.Category;
 import com.barcode.recopo.card.dto.CardRequestDto;
 import com.barcode.recopo.card.dto.CardResponseDto;
@@ -41,16 +42,14 @@ public class CardService {
 
     @Transactional
     public CardResponseDto createCard(Long memberId, CardRequestDto requestDto) {
-        String extractedHashtags = extractHashtags(requestDto.content());
-
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-
+        validateCardRequest(requestDto);
         Card card = Card.create(
                 requestDto.title(),
                 requestDto.content(),
                 requestDto.category(),
-                extractedHashtags,
+                requestDto.hashtag(),
                 member
         );
 
@@ -59,21 +58,36 @@ public class CardService {
         return convertToDto(savedCard);
     }
 
-    public List<CardResponseDto> getAllCards(Long memberId, Category category, String sortBy) {
+    public List<CardResponseDto> getAllCards(Long memberId, Category category, String keyword, CardSortBy sortBy) {
+        CardSortBy sortCriteria = (sortBy != null) ? sortBy : CardSortBy.LATEST;
+
         Sort sort;
-        if ("oldest".equals(sortBy)) {
-            sort = Sort.by(Sort.Direction.ASC, "createdAt");
-        } else if ("updated".equals(sortBy)) {
-            sort = Sort.by(Sort.Direction.DESC, "updatedAt");
-        } else {
-            sort = Sort.by(Sort.Direction.DESC, "createdAt");
+        switch (sortCriteria) {
+            case OLDEST:
+                sort = Sort.by(Sort.Direction.ASC, "createdAt");
+                break;
+            case MODIFIED:
+                sort = Sort.by(Sort.Direction.DESC, "updatedAt");
+                break;
+            case LATEST:
+            default:
+                sort = Sort.by(Sort.Direction.DESC, "createdAt");
+                break;
         }
 
         List<Card> cards;
         if (category == null) {
-            cards = cardRepository.findByMemberMemberIdAndIsConvertedFalse(memberId, sort);
+            if (keyword == null || keyword.isBlank()) {
+                cards = cardRepository.findByMemberMemberIdAndIsConvertedFalse(memberId, sort);
+            } else {
+                cards = cardRepository.findAllByMember_MemberIdAndHashtagContaining(memberId, keyword, sort);
+            }
         } else {
-            cards = cardRepository.findByMemberMemberIdAndCategoryAndIsConvertedFalse(memberId, category, sort);
+            if (keyword == null || keyword.isBlank()) {
+                cards = cardRepository.findByMemberMemberIdAndCategoryAndIsConvertedFalse(memberId, category, sort);
+            } else {
+                cards = cardRepository.findAllByMember_MemberIdAndCategoryAndHashtagContaining(memberId, category, keyword, sort);
+            }
         }
         return cards.stream()
                 .map(this::convertToDto)
@@ -90,17 +104,7 @@ public class CardService {
         return convertToDto(card);
     }
 
-    private String extractHashtags(String content) {
-        if (content == null || content.isEmpty()) return "";
 
-        Pattern pattern = Pattern.compile("#([\\w가-힣]+)");
-        Matcher matcher = pattern.matcher(content);
-
-        return matcher.results()
-                .map(mr -> mr.group(1))
-                .distinct()
-                .collect(Collectors.joining(","));
-    }
     @Transactional
     public void deleteCard(Long cardId, Long memberId) {
         Card card = cardRepository.findById(cardId)
@@ -123,10 +127,27 @@ public class CardService {
         if (!card.getMember().getMemberId().equals(memberId)) {
             throw new CustomException(ErrorCode.UNAUTHORIZED_CARD_ACCESS);
         }
-        // 내용이 바뀌면 해시태그도 다시 추출
-        String extractedHashtags = extractHashtags(requestDto.content());
-
-        card.update(requestDto.title(), requestDto.content(), requestDto.category(), extractedHashtags);
+        validateCardRequest(requestDto);
+        card.update(requestDto.title(), requestDto.content(), requestDto.category(), requestDto.hashtag());
         return convertToDto(card);
+    }
+    private void validateCardRequest(CardRequestDto requestDto) {
+        if (requestDto.title() == null || requestDto.title().isBlank()) {
+            throw new CustomException(ErrorCode.TITLE_REQUIRED);
+        }
+        if (requestDto.content() == null || requestDto.content().isBlank()) {
+            throw new CustomException(ErrorCode.CONTENT_REQUIRED);
+        }
+        if (requestDto.category() == null) {
+            throw new CustomException(ErrorCode.CATEGORY_REQUIRED);
+        }
+
+        String hashtag = requestDto.hashtag();
+        if (hashtag != null && !hashtag.isBlank()) {
+            String[] tags = hashtag.split(",");
+            if (tags.length > 5) {
+                throw new CustomException(ErrorCode.TOO_MANY_HASHTAGS);
+            }
+        }
     }
 }

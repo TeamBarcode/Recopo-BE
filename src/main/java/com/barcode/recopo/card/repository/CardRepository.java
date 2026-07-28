@@ -12,13 +12,10 @@ import java.util.Optional;
 @Repository
 public interface CardRepository extends JpaRepository<Card, Long> {
 
-    List<Card> findByMemberMemberId(Long memberId);
-    List<Card> findByMemberMemberId(Long memberId, Sort sort);
-    List<Card> findByMemberMemberIdAndCategory(Long member_memberId, Category category, Sort sort);
     List<Card> findByMemberMemberIdAndIsConvertedFalse(Long memberId, Sort sort);
     List<Card> findByMemberMemberIdAndCategoryAndIsConvertedFalse(Long memberId, Category category, Sort sort);
-    List<Card> findByHashtagContaining(String hashtag);
-
+    List<Card> findAllByMember_MemberIdAndHashtagContaining(Long memberId, String keyword, Sort sort);
+    List<Card> findAllByMember_MemberIdAndCategoryAndHashtagContaining(Long memberId, Category category, String keyword, Sort sort);
     Optional<Card> findByCardIdAndMember_MemberId(Long cardId, Long memberId);
 
     // 회원이 작성한 카드 개수 조회 (마이페이지용)

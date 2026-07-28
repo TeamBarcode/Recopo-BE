@@ -1,5 +1,6 @@
 package com.barcode.recopo.card.controller;
 
+import com.barcode.recopo.card.domain.CardSortBy;
 import com.barcode.recopo.card.domain.Category;
 import com.barcode.recopo.card.dto.CardRequestDto;
 import com.barcode.recopo.card.dto.CardResponseDto;
@@ -32,9 +33,10 @@ public class CardController {
     public ResponseEntity<List<CardResponseDto>> getAllCards(
             @AuthenticationPrincipal Long memberId,
             @RequestParam(required = false) Category category,
-            @RequestParam(value = "sortBy", required = false, defaultValue = "latest") String sortBy // 👈 'sort'를 'sortBy'로 변경
+            @RequestParam(value = "keyword", required = false, defaultValue = "") String keyword,
+            @RequestParam(value = "sortBy", required = false, defaultValue = "LATEST") CardSortBy sortBy
     ) {
-        List<CardResponseDto> cards = cardService.getAllCards(memberId, category, sortBy);
+        List<CardResponseDto> cards = cardService.getAllCards(memberId, category, keyword, sortBy);
         return ResponseEntity.ok(cards);
     }
 

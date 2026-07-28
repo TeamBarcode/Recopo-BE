@@ -50,10 +50,10 @@ public class Card {
         return new Card(title, content, category, hashtag, member);
     }
     public void update(String title, String content, Category category, String hashtag) {
-        this.title = title;
-        this.content = content;
-        this.category = category;
-        this.hashtag = hashtag;
+        if (title != null) this.title = title;
+        if (content != null) this.content = content;
+        if (category != null) this.category = category;
+        if (hashtag != null) this.hashtag = hashtag;
         this.updatedAt = LocalDateTime.now();
     }
     @Column(nullable = false)
