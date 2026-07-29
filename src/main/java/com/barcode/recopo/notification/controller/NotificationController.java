@@ -15,7 +15,6 @@ import java.util.List;
 public class NotificationController {
     private final NotificationService notificationService;
 
-    //내 알림 목록 조회
     @GetMapping
     public ResponseEntity<List<NotificationResponse>> getNotifications(
             @AuthenticationPrincipal Long memberId
@@ -25,7 +24,6 @@ public class NotificationController {
         );
     }
 
-    //알림 한 개 읽음 처리
     @PatchMapping("/{notificationId}/read")
     public ResponseEntity<Void> readNotification(
             @AuthenticationPrincipal Long memberId,
@@ -35,7 +33,6 @@ public class NotificationController {
         return ResponseEntity.noContent().build();
     }
 
-    //모든 알림 읽음 처리
     @PatchMapping("/read-all")
     public ResponseEntity<Void> readAllNotifications(
             @AuthenticationPrincipal Long memberId

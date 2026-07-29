@@ -12,8 +12,8 @@ public record IdeaResponseDto(
         String hashtag,
         Category category,
         String visibility,
-        LocalDateTime createdAt,
-        LocalDateTime updatedAt // 추가
+        int likeCount,
+        LocalDateTime createdAt
 ) {
     public static IdeaResponseDto from(Idea idea) {
         return new IdeaResponseDto(
@@ -23,8 +23,8 @@ public record IdeaResponseDto(
                 idea.getHashtag(),
                 idea.getCategory(),
                 idea.getVisibility().name(),
-                idea.getCreatedAt(),
-                idea.getUpdatedAt()
+                idea.getLikeCount(),
+                idea.getCreatedAt()
         );
     }
 }

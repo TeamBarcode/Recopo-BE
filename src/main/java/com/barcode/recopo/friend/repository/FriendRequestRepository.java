@@ -26,4 +26,8 @@ public interface FriendRequestRepository
             Long requestId,
             Member receiver
     );
+
+    // 회원 탈퇴 시 본인이 보낸/받은 친구 요청 삭제
+    void deleteAllByRequester(Member requester);
+    void deleteAllByReceiver(Member receiver);
 }
