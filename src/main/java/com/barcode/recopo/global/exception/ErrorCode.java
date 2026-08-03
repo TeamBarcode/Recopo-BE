@@ -30,6 +30,9 @@ public enum ErrorCode {
     CONTENT_REQUIRED(400, "본문은 필수입니다."),
     CATEGORY_REQUIRED(400, "카테고리는 필수입니다."),
 
+    //recommendation
+    RECOMMENDATION_NOT_FOUND(404, "AI 추천 결과를 찾을 수 없습니다."),
+
     // idea
     IDEA_NOT_FOUND(404, "해당 아이디어를 찾을 수 없습니다."),
     UNAUTHORIZED_IDEA_ACCESS(403, "본인의 아이디어만 접근할 수 있습니다."),

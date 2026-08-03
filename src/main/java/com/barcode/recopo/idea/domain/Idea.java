@@ -3,6 +3,7 @@ package com.barcode.recopo.idea.domain;
 import com.barcode.recopo.card.domain.Card;
 import com.barcode.recopo.card.domain.Category;
 import com.barcode.recopo.member.domain.Member;
+import com.barcode.recopo.recommendation.domain.Recommendation;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -44,8 +45,9 @@ public class Idea {
     @JoinColumn(name = "card_id", nullable = false)
     private Card card;
 
-    @Column(name = "recommendation_id") // nullable = true (기본값)
-    private Long recommendationId;
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "recommendation_id")
+    private Recommendation recommendation;
 
     @Column(nullable = false)
     private int likeCount = 0;
@@ -61,6 +63,21 @@ public class Idea {
         idea.visibility = visibility;
         idea.member = card.getMember();
         idea.card = card;
+        idea.likeCount = 0;
+        idea.createdAt = LocalDateTime.now();
+        return idea;
+    }
+
+    public static Idea createWithRecommendation(Card card, Visibility visibility, Recommendation recommendation) {
+        Idea idea = new Idea();
+        idea.title = card.getTitle();
+        idea.content = card.getContent();
+        idea.hashtag = card.getHashtag();
+        idea.category = card.getCategory();
+        idea.visibility = visibility;
+        idea.member = card.getMember();
+        idea.card = card;
+        idea.recommendation = recommendation; // 추천 결과 매핑!
         idea.likeCount = 0;
         idea.createdAt = LocalDateTime.now();
         return idea;

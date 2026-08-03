@@ -11,6 +11,8 @@ import com.barcode.recopo.idea.domain.Visibility;
 import com.barcode.recopo.idea.dto.IdeaRequestDto;
 import com.barcode.recopo.idea.dto.IdeaResponseDto;
 import com.barcode.recopo.idea.repository.IdeaRepository;
+import com.barcode.recopo.recommendation.domain.Recommendation;
+import com.barcode.recopo.recommendation.repository.RecommendationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -25,9 +27,10 @@ public class IdeaService {
 
     private final IdeaRepository ideaRepository;
     private final CardRepository cardRepository;
+    private final RecommendationRepository recommendationRepository;
 
     @Transactional
-    public void saveAsIdea(Long cardId, Long memberId, Visibility visibility) {
+    public void saveAsIdea(Long cardId, Long memberId, IdeaRequestDto.Save requestDto) {
         Card card = cardRepository.findById(cardId)
                 .orElseThrow(() -> new CustomException(ErrorCode.CARD_NOT_FOUND));
 
@@ -38,9 +41,20 @@ public class IdeaService {
             throw new CustomException(ErrorCode.ALREADY_CONVERTED_CARD);
         }
 
-        Idea idea = Idea.create(card, visibility);
-        ideaRepository.save(idea);
+        Idea idea;
 
+        // recommendationId가 있는 경우
+        if (requestDto.recommendationId() != null) {
+            Recommendation recommendation = recommendationRepository.findById(requestDto.recommendationId())
+                    .orElseThrow(() -> new CustomException(ErrorCode.RECOMMENDATION_NOT_FOUND));
+
+            idea = Idea.createWithRecommendation(card, requestDto.visibility(), recommendation);
+        } else {
+            // 추천 결과가 없는 일반 전환인 경우
+            idea = Idea.create(card, requestDto.visibility());
+        }
+
+        ideaRepository.save(idea);
         card.convertToIdea();
     }
 
