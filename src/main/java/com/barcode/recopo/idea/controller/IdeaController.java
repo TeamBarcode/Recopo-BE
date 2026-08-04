@@ -19,12 +19,13 @@ public class IdeaController {
 
     private final IdeaService ideaService;
 
-    @PostMapping("/save")
+    @PostMapping("/cards/{cardId}/ideas")
     public ResponseEntity<Void> saveIdea(
             @AuthenticationPrincipal Long memberId,
+            @PathVariable Long cardId,
             @RequestBody IdeaRequestDto.Save request
     ) {
-        ideaService.saveAsIdea(request.cardId(), memberId, request.visibility());
+        ideaService.saveAsIdea(cardId, memberId, request);
         return ResponseEntity.ok().build();
     }
 
