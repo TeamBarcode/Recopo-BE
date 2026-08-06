@@ -58,7 +58,7 @@ public class IdeaService {
         card.convertToIdea();
     }
 
-    public List<IdeaResponseDto> findAllIdeas(Long memberId, Category category, String keyword, IdeaSortBy sortBy) {
+    public List<IdeaResponseDto> findAllIdeas(Long memberId, Category category, String keyword, IdeaSortBy sortBy, Visibility visibility) {
         IdeaSortBy sortCriteria = (sortBy != null) ? sortBy : IdeaSortBy.LATEST;
 
         Sort sort;
@@ -75,17 +75,33 @@ public class IdeaService {
                 break;
         }
         List<Idea> ideas;
-        if (category == null) {
-            if (keyword == null || keyword.isBlank()) {
-                ideas = ideaRepository.findAllByMember_MemberId(memberId, sort);
+        if (visibility == null) {
+            if (category == null) {
+                if (keyword == null || keyword.isBlank()) {
+                    ideas = ideaRepository.findAllByMember_MemberId(memberId, sort);
+                } else {
+                    ideas = ideaRepository.findAllByMember_MemberIdAndHashtagContaining(memberId, keyword, sort);
+                }
             } else {
-                ideas = ideaRepository.findAllByMember_MemberIdAndHashtagContaining(memberId, keyword, sort);
+                if (keyword == null || keyword.isBlank()) {
+                    ideas = ideaRepository.findAllByMember_MemberIdAndCategory(memberId, category, sort);
+                } else {
+                    ideas = ideaRepository.findAllByMember_MemberIdAndCategoryAndHashtagContaining(memberId, category, keyword, sort);
+                }
             }
         } else {
-            if (keyword == null || keyword.isBlank()) {
-                ideas = ideaRepository.findAllByMember_MemberIdAndCategory(memberId, category, sort);
+            if (category == null) {
+                if (keyword == null || keyword.isBlank()) {
+                    ideas = ideaRepository.findAllByMember_MemberIdAndVisibility(memberId, visibility, sort);
+                } else {
+                    ideas = ideaRepository.findAllByMember_MemberIdAndHashtagContainingAndVisibility(memberId, keyword, visibility, sort);
+                }
             } else {
-                ideas = ideaRepository.findAllByMember_MemberIdAndCategoryAndHashtagContaining(memberId, category, keyword, sort);
+                if (keyword == null || keyword.isBlank()) {
+                    ideas = ideaRepository.findAllByMember_MemberIdAndCategoryAndVisibility(memberId, category, visibility, sort);
+                } else {
+                    ideas = ideaRepository.findAllByMember_MemberIdAndCategoryAndHashtagContainingAndVisibility(memberId, category, keyword, visibility, sort);
+                }
             }
         }
 
