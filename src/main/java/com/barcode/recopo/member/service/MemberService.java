@@ -1,6 +1,7 @@
 package com.barcode.recopo.member.service;
 
 import com.barcode.recopo.auth.service.AuthService;
+import com.barcode.recopo.card.domain.Card;
 import com.barcode.recopo.card.repository.CardRepository;
 import com.barcode.recopo.comment.repository.CommentRepository;
 import com.barcode.recopo.friend.repository.FriendRequestRepository;
@@ -22,6 +23,7 @@ import com.barcode.recopo.member.dto.response.ProfileUpdateResponse;
 import com.barcode.recopo.member.repository.MemberRepository;
 import com.barcode.recopo.member.storage.ImageStorage;
 import com.barcode.recopo.notification.repository.NotificationRepository;
+import com.barcode.recopo.recommendation.repository.RecommendationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +32,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -49,6 +52,7 @@ public class MemberService {
     private final FriendRequestRepository friendRequestRepository;
     private final FriendshipRepository friendshipRepository;
     private final NotificationRepository notificationRepository;
+    private final RecommendationRepository recommendationRepository;
     private final AuthService authService;
 
     // 내 정보 조회
@@ -153,6 +157,12 @@ public class MemberService {
         notificationRepository.deleteAllByReceiver(member);
         notificationRepository.deleteAllByActor(member);
         ideaRepository.deleteAllByMember(member);
+
+        // Recommendation.cardId는 연관관계 매핑이 아닌 단순 컬럼이라 Card 삭제만으로는 정리되지 않으므로 먼저 삭제한다
+        List<Long> cardIds = cardRepository.findAllByMember(member).stream()
+                .map(Card::getCardId)
+                .toList();
+        recommendationRepository.deleteAllByCardIdIn(cardIds);
         cardRepository.deleteAllByMember(member);
         friendRequestRepository.deleteAllByRequester(member);
         friendRequestRepository.deleteAllByReceiver(member);
