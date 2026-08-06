@@ -2,6 +2,7 @@ package com.barcode.recopo.idea.controller;
 
 import com.barcode.recopo.card.domain.Category;
 import com.barcode.recopo.idea.domain.IdeaSortBy;
+import com.barcode.recopo.idea.domain.Visibility;
 import com.barcode.recopo.idea.dto.IdeaRequestDto;
 import com.barcode.recopo.idea.dto.IdeaResponseDto;
 import com.barcode.recopo.idea.service.IdeaService;
@@ -34,9 +35,10 @@ public class IdeaController {
             @AuthenticationPrincipal Long memberId,
             @RequestParam(value = "category", required = false) Category category,
             @RequestParam(value = "keyword", required = false, defaultValue = "") String keyword,
-            @RequestParam(value = "sortBy", required = false, defaultValue = "LATEST") IdeaSortBy sortBy
+            @RequestParam(value = "sortBy", required = false, defaultValue = "LATEST") IdeaSortBy sortBy,
+            @RequestParam(value = "visibility", required = false) Visibility visibility
     ) {
-        return ResponseEntity.ok(ideaService.findAllIdeas(memberId, category, keyword, sortBy));
+        return ResponseEntity.ok(ideaService.findAllIdeas(memberId, category, keyword, sortBy, visibility));
     }
 
     @GetMapping("/{ideaId}")
