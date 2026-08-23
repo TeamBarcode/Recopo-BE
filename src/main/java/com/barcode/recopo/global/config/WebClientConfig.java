@@ -9,9 +9,11 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class WebClientConfig {
 
     @Bean
-    public WebClient aiServerWebClient() {
+    public WebClient aiServerWebClient(
+            @Value("${ai.server.url:http://localhost:8000}") String aiServerUrl
+    ) {
         return WebClient.builder()
-                .baseUrl("https://quantum-suction-catnap.ngrok-free.dev")
+                .baseUrl(aiServerUrl)
                 .build();
     }
 }

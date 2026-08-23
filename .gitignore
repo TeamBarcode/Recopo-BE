@@ -57,3 +57,5 @@ src/main/resources/static/google-test.html
 /uploads/
 
 /google-test.html
+
+!src/main/resources/application-prod.yaml
