@@ -105,7 +105,7 @@ public class RecommendationService {
                 break;
             case "LATEST":
             default:
-                sort = Sort.by(Sort.Direction.DESC, "createdAt");
+                sort = Sort.by(Sort.Direction.DESC, "updatedAt");
                 break;
         }
         return recommendationRepository.findAllByCardId(cardId, sort);
