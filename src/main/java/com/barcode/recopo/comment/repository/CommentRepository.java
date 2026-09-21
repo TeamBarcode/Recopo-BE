@@ -13,6 +13,8 @@ import java.util.Optional;
 public interface CommentRepository extends JpaRepository<Comment, Long>{
     List<Comment> findAllByIdeaAndDeletedFalseOrderByCreatedAtAsc(Idea idea);
     Optional<Comment> findByCommentIdAndDeletedFalse(Long commentId);
+    long countByIdeaAndDeletedFalse(Idea idea);
+
     // 회원 탈퇴 시 본인이 작성한 댓글 삭제
     void deleteAllByMember(Member member);
     // 회원 탈퇴 시 본인 아이디어에 달린 댓글 삭제

@@ -5,6 +5,7 @@ import com.barcode.recopo.idealike.domain.IdeaLike;
 import com.barcode.recopo.member.domain.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
 import java.util.Optional;
 import java.util.List;
 

@@ -1,7 +1,7 @@
 package com.barcode.recopo.idealike.controller;
 
-import com.barcode.recopo.idea.dto.IdeaResponseDto;
 import com.barcode.recopo.idealike.dto.response.IdeaLikeResponse;
+import com.barcode.recopo.idealike.dto.response.LikedIdeaResponse;
 import com.barcode.recopo.idealike.service.IdeaLikeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -48,7 +48,7 @@ public class IdeaLikeController {
     }
 
     @GetMapping("/liked")
-    public ResponseEntity<List<IdeaResponseDto>> getLikedIdeas(
+    public ResponseEntity<List<LikedIdeaResponse>> getLikedIdeas(
             @AuthenticationPrincipal Long memberId
     ){
         return ResponseEntity.ok(
