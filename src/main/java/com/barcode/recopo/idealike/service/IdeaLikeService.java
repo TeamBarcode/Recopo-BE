@@ -2,7 +2,6 @@ package com.barcode.recopo.idealike.service;
 
 import com.barcode.recopo.global.exception.CustomException;
 import com.barcode.recopo.global.exception.ErrorCode;
-import com.barcode.recopo.idea.dto.IdeaResponseDto;
 import com.barcode.recopo.idea.domain.Idea;
 import com.barcode.recopo.idea.repository.IdeaRepository;
 import com.barcode.recopo.idealike.domain.IdeaLike;
@@ -14,6 +13,8 @@ import com.barcode.recopo.notification.domain.Notification;
 import com.barcode.recopo.notification.domain.NotificationTargetType;
 import com.barcode.recopo.notification.domain.NotificationType;
 import com.barcode.recopo.notification.repository.NotificationRepository;
+import com.barcode.recopo.comment.repository.CommentRepository;
+import com.barcode.recopo.idealike.dto.response.LikedIdeaResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,9 +30,10 @@ public class IdeaLikeService {
     private final IdeaRepository ideaRepository;
     private final MemberRepository memberRepository;
     private final NotificationRepository notificationRepository;
+    private final CommentRepository commentRepository;
 
     @Transactional
-    public IdeaLikeResponse likeIdea(Long memberId, long ideaId){
+    public IdeaLikeResponse likeIdea(Long memberId, Long ideaId){
         Member member=memberRepository.findById(memberId).orElseThrow(()->
                 new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
@@ -49,7 +51,7 @@ public class IdeaLikeService {
 
         Notification notification=Notification.create(
                 NotificationType.LIKE,
-                member.getNickname()+"님이 회원님의 아이디어를 좋아합니다",
+                member.getNickname()+"님이 회원님의 아이디어를 좋아합니다.",
                 idea.getIdeaId(),
                 NotificationTargetType.IDEA,
                 idea.getMember(),
@@ -111,14 +113,31 @@ public class IdeaLikeService {
         );
     }
 
-    public List<IdeaResponseDto> getLikedIdeas(Long memberId){
-        Member member=memberRepository.findById(memberId).orElseThrow(()->
+    public List<LikedIdeaResponse> getLikedIdeas(Long memberId) {
+        Member member = memberRepository.findById(memberId).orElseThrow(() ->
                 new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         return ideaLikeRepository.findAllByMemberOrderByCreatedAtDesc(member)
                 .stream()
-                .map(IdeaLike::getIdea)
-                .map(IdeaResponseDto::from)
+                .map(ideaLike -> {
+                    Idea idea = ideaLike.getIdea();
+
+                    long likeCount = ideaLikeRepository.countByIdea(idea);
+
+                    long commentCount = commentRepository.countByIdeaAndDeletedFalse(idea);
+
+                    return new LikedIdeaResponse(
+                            idea.getIdeaId(),
+                            idea.getMember().getMemberId(),
+                            idea.getMember().getNickname(),
+                            idea.getTitle(),
+                            true,
+                            likeCount,
+                            commentCount,
+                            ideaLike.getCreatedAt(),
+                            idea.getCreatedAt()
+                    );
+                })
                 .toList();
     }
 }
