@@ -1,0 +1,100 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: recopo-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: recopo
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --max-connections=50
+      - --innodb-buffer-pool-size=256M
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - mysqladmin ping -h localhost -uroot -p$$MYSQL_ROOT_PASSWORD --silent
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  redis:
+    image: redis:7-alpine
+    container_name: recopo-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  ai:
+    build:
+      context: ../Recopo-AI
+      dockerfile: Dockerfile
+    container_name: recopo-ai
+    restart: unless-stopped
+    environment:
+      GITHUB_TOKEN: ${GITHUB_TOKEN:-}
+      DEEPL_API_KEY: ${DEEPL_API_KEY:-}
+    volumes:
+      - ai_data:/app/data
+    expose:
+      - "8000"
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - import urllib.request; urllib.request.urlopen('http://localhost:8000/health')
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+
+  be:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: recopo-be
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_URL: jdbc:mysql://mysql:3306/recopo?useSSL=false&useUnicode=true&characterEncoding=UTF8&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      JWT_SECRET: ${JWT_SECRET}
+      FILE_STORAGE_TYPE: local
+      FILE_UPLOAD_DIR: /app/uploads
+      FILE_BASE_URL: ${FILE_BASE_URL}
+      AI_SERVER_URL: http://ai:8000
+      JAVA_TOOL_OPTIONS: -Xms128m -Xmx768m
+    ports:
+      - "8080:8080"
+    volumes:
+      - uploads_data:/app/uploads
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      ai:
+        condition: service_healthy
+
+volumes:
+  mysql_data:
+  redis_data:
+  ai_data:
+  uploads_data:
