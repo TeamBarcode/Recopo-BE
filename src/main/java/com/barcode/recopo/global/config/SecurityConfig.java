@@ -59,7 +59,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOriginPatterns(List.of(
-                "https://recopo-fe.vercel.app",
+                "https://recopo-fe-six.vercel.app",
                 "http://localhost:3000",
                 "http://localhost:5173"
         ));
