@@ -78,7 +78,7 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       FILE_STORAGE_TYPE: local
       FILE_UPLOAD_DIR: /app/uploads
-      FILE_BASE_URL: ${FILE_BASE_URL}
+      FILE_BASE_URL: https://recopo-api.duckdns.org
       AI_SERVER_URL: http://ai:8000
       JAVA_TOOL_OPTIONS: -Xms128m -Xmx768m
     ports:
