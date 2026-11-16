@@ -4,6 +4,7 @@ import com.barcode.recopo.friend.dto.request.FriendRequestCreateRequest;
 import com.barcode.recopo.friend.dto.response.FriendRequestResponse;
 import com.barcode.recopo.friend.dto.response.FriendResponse;
 import com.barcode.recopo.friend.service.FriendService;
+import com.barcode.recopo.idea.dto.IdeaResponseDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -71,6 +72,34 @@ public class FriendController {
         return ResponseEntity.ok(
                 friendService.getFriends(memberId)
         );
+    }
+
+    @GetMapping("/{friendId}/ideas")
+    public ResponseEntity<List<IdeaResponseDto>> getFriendIdeas(
+            @AuthenticationPrincipal Long memberId,
+            @PathVariable("friendId") Long friendId
+    ) {
+        return ResponseEntity.ok(friendService.getFriendIdeas(memberId, friendId));
+    }
+
+    //친구 삭제
+    @DeleteMapping("/{friendId}")
+    public ResponseEntity<Void> deleteFriend(
+            @AuthenticationPrincipal Long memberId,
+            @PathVariable("friendId") Long friendId
+    ) {
+        friendService.deleteFriend(memberId, friendId);
+        return ResponseEntity.noContent().build();
+    }
+
+    //보낸 요청 취소
+    @DeleteMapping("/requests/{requestId}")
+    public ResponseEntity<Void> cancelFriendRequest(
+            @AuthenticationPrincipal Long memberId,
+            @PathVariable("requestId") Long requestId
+    ) {
+        friendService.cancelFriendRequest(memberId, requestId);
+        return ResponseEntity.noContent().build();
     }
 
 }

@@ -3,6 +3,7 @@ package com.barcode.recopo.friend.repository;
 import com.barcode.recopo.friend.domain.FriendRequest;
 import com.barcode.recopo.friend.domain.FriendRequestStatus;
 import com.barcode.recopo.member.domain.Member;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -21,6 +22,12 @@ public interface FriendRequestRepository
             Member receiver,
             FriendRequestStatus status
     );
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    Optional<FriendRequest> findByRequestIdAndReceiver(Long requestId, Member receiver);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    Optional<FriendRequest> findByRequestIdAndRequester(Long requestId, Member requester);
 
     Optional<FriendRequest> findByRequestIdAndReceiver(
             Long requestId,

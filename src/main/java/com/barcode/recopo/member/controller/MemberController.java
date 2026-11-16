@@ -7,6 +7,7 @@ import com.barcode.recopo.member.dto.response.CardColorSettingResponse;
 import com.barcode.recopo.member.dto.response.LoginIdAvailabilityResponse;
 import com.barcode.recopo.member.dto.response.MemberProfileResponse;
 import com.barcode.recopo.member.dto.response.MemberWithdrawalResponse;
+import com.barcode.recopo.member.dto.response.MemberSearchResponse;
 import com.barcode.recopo.member.dto.response.ProfileImageResponse;
 import com.barcode.recopo.member.dto.response.ProfileUpdateResponse;
 import com.barcode.recopo.member.service.MemberService;
@@ -24,6 +25,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/members")
@@ -84,6 +87,15 @@ public class MemberController {
     @DeleteMapping("/me/profile-image")
     public ProfileImageResponse resetProfileImage(@AuthenticationPrincipal Long memberId) {
         return memberService.resetProfileImage(memberId);
+    }
+
+    //친구 검색
+    @GetMapping("/search")
+    public List<MemberSearchResponse> searchMembers(
+            @AuthenticationPrincipal Long memberId,
+            @RequestParam(name="keyword", required = false) String keyword
+    ){
+        return memberService.searchMembers(memberId, keyword);
     }
 
     // 회원 탈퇴 (Hard Delete)

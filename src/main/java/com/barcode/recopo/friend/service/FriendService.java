@@ -13,6 +13,10 @@ import com.barcode.recopo.notification.domain.Notification;
 import com.barcode.recopo.notification.domain.NotificationTargetType;
 import com.barcode.recopo.notification.domain.NotificationType;
 import com.barcode.recopo.notification.repository.NotificationRepository;
+import com.barcode.recopo.idea.domain.IdeaSortBy;
+import com.barcode.recopo.idea.domain.Visibility;
+import com.barcode.recopo.idea.dto.IdeaResponseDto;
+import com.barcode.recopo.idea.service.IdeaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +35,7 @@ public class FriendService {
     private final FriendRequestRepository friendRequestRepository;
     private final FriendshipRepository friendshipRepository;
     private final NotificationRepository notificationRepository;
+    private final IdeaService ideaService;
 
     @Transactional
     public void sendFriendRequest(Long requesterId, Long receiverId){
@@ -145,6 +150,26 @@ public class FriendService {
         );
     }
 
+    @Transactional
+    public void cancelFriendRequest(Long memberId, Long requestId) {
+        Member requester = findMember(memberId);
+
+        FriendRequest request = friendRequestRepository
+                .findByRequestIdAndRequester(requestId, requester)
+                .orElseThrow(() -> new CustomException(ErrorCode.FRIEND_REQUEST_NOT_FOUND));
+
+        if (request.getStatus() != FriendRequestStatus.PENDING) {
+            throw new CustomException(ErrorCode.FRIEND_REQUEST_ALREADY_PROCESSED);
+        }
+
+        notificationRepository.deleteByReceiverAndTargetTypeAndTargetId(
+                request.getReceiver(),
+                NotificationTargetType.FRIEND_REQUEST,
+                requestId
+        );
+        friendRequestRepository.delete(request);
+    }
+
     public List<FriendResponse> getFriends(Long memberId) {
         Member loginMember = findMember(memberId);
 
@@ -172,6 +197,32 @@ public class FriendService {
                     );
                 })
                 .toList();
+    }
+
+    @Transactional
+    public void deleteFriend(Long memberId, Long friendId) {
+        Member member = findMember(memberId);
+        Member friend = findMember(friendId);
+
+        Friendship friendship = friendshipRepository.findByMemberAndFriend(member, friend)
+                .or(() -> friendshipRepository.findByMemberAndFriend(friend, member))
+                .orElseThrow(() -> new CustomException(ErrorCode.FRIENDSHIP_NOT_FOUND));
+
+        friendshipRepository.delete(friendship);
+    }
+
+    @Transactional(readOnly = true)
+    public List<IdeaResponseDto> getFriendIdeas(Long memberId, Long friendId) {
+        Member member = findMember(memberId);
+        Member friend = findMember(friendId);
+
+        if (!isAlreadyFriends(member, friend)) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED_IDEA_ACCESS);
+        }
+
+        return ideaService.findAllIdeas(
+                friendId, null, "", IdeaSortBy.LATEST, Visibility.PUBLIC
+        );
     }
 
     private Member findMember(Long memberId){

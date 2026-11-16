@@ -31,6 +31,7 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+import com.barcode.recopo.member.dto.response.MemberSearchResponse;
 
 import java.util.List;
 import java.util.Set;
@@ -206,6 +207,24 @@ public class MemberService {
             return "";
         }
         return filename.substring(filename.lastIndexOf('.'));
+    }
+
+    //친구 검색
+    @Transactional(readOnly=true)
+    public List<MemberSearchResponse> searchMembers(Long currentMemberId, String keyword){
+        if (keyword == null || keyword.isBlank()){
+            return List.of();
+        }
+
+        return memberRepository.findTop20ByNicknameContainingIgnoreCaseAndDeletedFalseAndMemberIdNotOrderByNicknameAscMemberIdAsc(
+                keyword.strip(), currentMemberId)
+                .stream()
+                .map(member->new MemberSearchResponse(
+                        member.getMemberId(),
+                        member.getNickname(),
+                        member.getProfileImageUrl()
+                ))
+                .toList();
     }
 
 }

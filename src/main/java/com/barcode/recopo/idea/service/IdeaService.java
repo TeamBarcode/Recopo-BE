@@ -11,6 +11,9 @@ import com.barcode.recopo.idea.domain.Visibility;
 import com.barcode.recopo.idea.dto.IdeaRequestDto;
 import com.barcode.recopo.idea.dto.IdeaResponseDto;
 import com.barcode.recopo.idea.repository.IdeaRepository;
+import com.barcode.recopo.friend.repository.FriendshipRepository;
+import com.barcode.recopo.member.domain.Member;
+import com.barcode.recopo.member.repository.MemberRepository;
 import com.barcode.recopo.recommendation.domain.Recommendation;
 import com.barcode.recopo.recommendation.repository.RecommendationRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +31,8 @@ public class IdeaService {
     private final IdeaRepository ideaRepository;
     private final CardRepository cardRepository;
     private final RecommendationRepository recommendationRepository;
+    private final FriendshipRepository friendshipRepository;
+    private final MemberRepository memberRepository;
 
     @Transactional
     public void saveAsIdea(Long cardId, Long memberId, IdeaRequestDto.Save requestDto) {
@@ -54,8 +59,9 @@ public class IdeaService {
             idea = Idea.create(card, requestDto.visibility());
         }
 
-        ideaRepository.save(idea);
+        Idea savedIdea = ideaRepository.save(idea);
         card.convertToIdea();
+        return savedIdea.getIdeaId();
     }
 
     public List<IdeaResponseDto> findAllIdeas(Long memberId, Category category, String keyword, IdeaSortBy sortBy, Visibility visibility) {
@@ -111,10 +117,29 @@ public class IdeaService {
     }
 
     public IdeaResponseDto findOneIdea(Long ideaId, Long memberId) {
-        Idea idea = ideaRepository.findByIdeaIdAndMember_MemberId(ideaId, memberId)
+        Idea idea = ideaRepository.findById(ideaId)
                 .orElseThrow(() -> new CustomException(ErrorCode.UNAUTHORIZED_IDEA_ACCESS));
+
+        Member author = idea.getMember();
+        if (author.getMemberId().equals(memberId)) {
+            return IdeaResponseDto.from(idea);
+        }
+
+        if (idea.getVisibility() != Visibility.PUBLIC) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED_IDEA_ACCESS);
+        }
+
+        Member viewer = memberRepository.getReferenceById(memberId);
+        boolean friends = friendshipRepository.existsByMemberAndFriend(viewer, author)
+                || friendshipRepository.existsByMemberAndFriend(author, viewer);
+
+        if (!friends) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED_IDEA_ACCESS);
+        }
+
         return IdeaResponseDto.from(idea);
     }
+
     @Transactional
     public IdeaResponseDto updateIdea(Long memberId, Long ideaId, IdeaRequestDto.Update requestDto) {
         Idea idea = ideaRepository.findByIdeaIdAndMember_MemberId(ideaId, memberId)

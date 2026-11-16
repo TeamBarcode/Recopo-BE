@@ -5,6 +5,7 @@ import com.barcode.recopo.idea.domain.IdeaSortBy;
 import com.barcode.recopo.idea.domain.Visibility;
 import com.barcode.recopo.idea.dto.IdeaRequestDto;
 import com.barcode.recopo.idea.dto.IdeaResponseDto;
+import com.barcode.recopo.idea.dto.IdeaSaveResponse;
 import com.barcode.recopo.idea.service.IdeaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,13 +22,13 @@ public class IdeaController {
     private final IdeaService ideaService;
 
     @PostMapping("/cards/{cardId}/ideas")
-    public ResponseEntity<Void> saveIdea(
+    public ResponseEntity<IdeaSaveResponse> saveIdea(
             @AuthenticationPrincipal Long memberId,
             @PathVariable Long cardId,
             @RequestBody IdeaRequestDto.Save request
     ) {
-        ideaService.saveAsIdea(cardId, memberId, request);
-        return ResponseEntity.ok().build();
+        Long ideaId = ideaService.saveAsIdea(cardId, memberId, request);
+        return ResponseEntity.ok(new IdeaSaveResponse(ideaId));
     }
 
     @GetMapping
