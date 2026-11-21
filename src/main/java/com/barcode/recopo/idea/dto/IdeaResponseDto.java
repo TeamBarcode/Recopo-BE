@@ -16,9 +16,10 @@ public record IdeaResponseDto(
         String visibility,
         int likeCount,
         LocalDateTime createdAt,
-        RecommendationResponse recommendation
+        RecommendationResponse recommendation,
+        long commentCount
 ) {
-    public static IdeaResponseDto from(Idea idea) {
+    public static IdeaResponseDto from(Idea idea, long commentCount) {
         return new IdeaResponseDto(
                 idea.getIdeaId(),
                 idea.getTitle(),
@@ -29,7 +30,8 @@ public record IdeaResponseDto(
                 idea.getLikeCount(),
                 idea.getCreatedAt(),
                 // 추천 정보가 존재하면 변환해서 담고, 없으면 null 처리
-                idea.getRecommendation() != null ? RecommendationResponse.from(idea.getRecommendation()) : null
+                idea.getRecommendation() != null ? RecommendationResponse.from(idea.getRecommendation()) : null,
+                commentCount
         );
     }
 

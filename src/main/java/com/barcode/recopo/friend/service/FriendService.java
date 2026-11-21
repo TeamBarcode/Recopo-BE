@@ -147,6 +147,16 @@ public class FriendService {
                 NotificationTargetType.FRIEND_REQUEST,
                 requestId
         );
+
+        Notification notification = Notification.create(
+                NotificationType.FRIEND_REQUEST_ACCEPTED,
+                receiver.getNickname() + "님이 친구 요청을 수락했습니다.",
+                requestId,
+                NotificationTargetType.FRIEND_REQUEST,
+                friendRequest.getRequester(),
+                receiver
+        );
+        notificationRepository.save(notification);
     }
 
     @Transactional

@@ -6,6 +6,7 @@ import com.barcode.recopo.idea.domain.Visibility;
 import org.springframework.data.domain.Sort;
 import com.barcode.recopo.member.domain.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -15,13 +16,51 @@ import java.util.Optional;
 public interface IdeaRepository extends JpaRepository<Idea, Long> {
     List<Idea> findAllByMember_MemberId(Long memberId, Sort sort);
     List<Idea> findAllByMember_MemberIdAndCategory(Long memberId, Category category, Sort sort);
-    List<Idea> findAllByMember_MemberIdAndHashtagContaining(Long memberId, String keyword, Sort sort);
-    List<Idea> findAllByMember_MemberIdAndCategoryAndHashtagContaining(Long memberId, Category category, String keyword, Sort sort);
+    @Query("""
+        select i from Idea i
+        where i.member.memberId = ?1
+          and (lower(i.title) like lower(concat('%', ?2, '%'))
+               or lower(i.hashtag) like lower(concat('%', ?2, '%')))
+        """)
+    List<Idea> findAllByMember_MemberIdAndHashtagContaining(
+            Long memberId, String keyword, Sort sort
+    );
+
+    @Query("""
+        select i from Idea i
+        where i.member.memberId = ?1
+          and i.category = ?2
+          and (lower(i.title) like lower(concat('%', ?3, '%'))
+               or lower(i.hashtag) like lower(concat('%', ?3, '%')))
+        """)
+    List<Idea> findAllByMember_MemberIdAndCategoryAndHashtagContaining(
+            Long memberId, Category category, String keyword, Sort sort
+    );
 
     List<Idea> findAllByMember_MemberIdAndVisibility(Long memberId, Visibility visibility, Sort sort);
     List<Idea> findAllByMember_MemberIdAndCategoryAndVisibility(Long memberId, Category category, Visibility visibility, Sort sort);
-    List<Idea> findAllByMember_MemberIdAndHashtagContainingAndVisibility(Long memberId, String keyword, Visibility visibility, Sort sort);
-    List<Idea> findAllByMember_MemberIdAndCategoryAndHashtagContainingAndVisibility(Long memberId, Category category, String keyword, Visibility visibility, Sort sort);
+    @Query("""
+        select i from Idea i
+        where i.member.memberId = ?1
+          and i.visibility = ?3
+          and (lower(i.title) like lower(concat('%', ?2, '%'))
+               or lower(i.hashtag) like lower(concat('%', ?2, '%')))
+        """)
+    List<Idea> findAllByMember_MemberIdAndHashtagContainingAndVisibility(
+            Long memberId, String keyword, Visibility visibility, Sort sort
+    );
+    @Query("""
+        select i from Idea i
+        where i.member.memberId = ?1
+          and i.category = ?2
+          and i.visibility = ?4
+          and (lower(i.title) like lower(concat('%', ?3, '%'))
+               or lower(i.hashtag) like lower(concat('%', ?3, '%')))
+        """)
+    List<Idea> findAllByMember_MemberIdAndCategoryAndHashtagContainingAndVisibility(
+            Long memberId, Category category, String keyword,
+            Visibility visibility, Sort sort
+    );
 
     Optional<Idea> findByIdeaIdAndMember_MemberId(Long ideaId, Long memberId);
 

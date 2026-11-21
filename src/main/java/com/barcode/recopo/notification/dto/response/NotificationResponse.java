@@ -16,6 +16,7 @@ public record NotificationResponse(
         String actorProfileImageUrl,
         boolean read,
         LocalDateTime createdAt,
-        LocalDateTime readAt
+        LocalDateTime readAt,
+        Long commentId
 ) {
 }

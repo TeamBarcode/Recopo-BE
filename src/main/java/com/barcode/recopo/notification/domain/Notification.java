@@ -39,6 +39,9 @@ public class Notification {
     @Column(name = "read_at")
     private LocalDateTime readAt;
 
+    @Column(name = "comment_id")
+    private Long commentId;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "target_type")
     private NotificationTargetType targetType;
@@ -92,5 +95,9 @@ public class Notification {
             this.read = true;
             this.readAt = LocalDateTime.now();
         }
+    }
+
+    public void setCommentId(Long commentId) {
+        this.commentId = commentId;
     }
 }

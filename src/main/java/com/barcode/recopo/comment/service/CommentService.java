@@ -84,6 +84,7 @@ public class CommentService {
                     receiver,
                     member
             );
+            notification.setCommentId(comment.getCommentId());
             notificationRepository.save(notification);
         }
         return new CommentResponse(

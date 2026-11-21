@@ -61,7 +61,8 @@ public class NotificationService {
                         notification.getActor().getProfileImageUrl(),
                         notification.isRead(),
                         notification.getCreatedAt(),
-                        notification.getReadAt()
+                        notification.getReadAt(),
+                        notification.getCommentId()
                 )).toList();
     }
 }

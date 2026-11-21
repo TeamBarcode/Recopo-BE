@@ -3,6 +3,7 @@ package com.barcode.recopo.idea.service;
 import com.barcode.recopo.card.domain.Card;
 import com.barcode.recopo.card.domain.Category;
 import com.barcode.recopo.card.repository.CardRepository;
+import com.barcode.recopo.comment.repository.CommentRepository;
 import com.barcode.recopo.global.exception.CustomException;
 import com.barcode.recopo.global.exception.ErrorCode;
 import com.barcode.recopo.idea.domain.Idea;
@@ -16,6 +17,7 @@ import com.barcode.recopo.member.domain.Member;
 import com.barcode.recopo.member.repository.MemberRepository;
 import com.barcode.recopo.recommendation.domain.Recommendation;
 import com.barcode.recopo.recommendation.repository.RecommendationRepository;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,7 @@ public class IdeaService {
 
     private final IdeaRepository ideaRepository;
     private final CardRepository cardRepository;
+    private final CommentRepository commentRepository;
     private final RecommendationRepository recommendationRepository;
     private final FriendshipRepository friendshipRepository;
     private final MemberRepository memberRepository;
@@ -112,7 +115,7 @@ public class IdeaService {
         }
 
         return ideas.stream()
-                .map(IdeaResponseDto::from)
+                .map(this::toIdeaResponse)
                 .toList();
     }
 
@@ -122,7 +125,7 @@ public class IdeaService {
 
         Member author = idea.getMember();
         if (author.getMemberId().equals(memberId)) {
-            return IdeaResponseDto.from(idea);
+            return toIdeaResponse(idea);
         }
 
         if (idea.getVisibility() != Visibility.PUBLIC) {
@@ -137,7 +140,7 @@ public class IdeaService {
             throw new CustomException(ErrorCode.UNAUTHORIZED_IDEA_ACCESS);
         }
 
-        return IdeaResponseDto.from(idea);
+        return toIdeaResponse(idea);
     }
 
     @Transactional
@@ -152,7 +155,7 @@ public class IdeaService {
                 requestDto.visibility()
         );
 
-        return IdeaResponseDto.from(idea);
+        return toIdeaResponse(idea);
     }
 
     @Transactional
@@ -171,5 +174,12 @@ public class IdeaService {
         if (tags.length > 5) {
             throw new CustomException(ErrorCode.TOO_MANY_HASHTAGS);
         }
+    }
+
+    private IdeaResponseDto toIdeaResponse(Idea idea) {
+        return IdeaResponseDto.from(
+                idea,
+                commentRepository.countVisibleComments(idea)
+        );
     }
 }

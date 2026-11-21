@@ -51,7 +51,8 @@ public class IdeaLikeService {
 
         Notification notification=Notification.create(
                 NotificationType.LIKE,
-                member.getNickname()+"님이 회원님의 아이디어를 좋아합니다.",
+                member.getNickname() + "님이 회원님의 아이디어 「"
+                        + idea.getTitle() + "」에 좋아요를 눌렀습니다.",
                 idea.getIdeaId(),
                 NotificationTargetType.IDEA,
                 idea.getMember(),
