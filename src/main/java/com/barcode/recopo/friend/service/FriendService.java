@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.barcode.recopo.friend.dto.response.FriendRequestResponse;
+import com.barcode.recopo.friend.dto.response.SentFriendRequestResponse;
 
 import java.util.List;
 import com.barcode.recopo.friend.dto.response.FriendResponse;
@@ -87,6 +88,28 @@ public class FriendService {
                         request.getRequester().getProfileImageUrl(),
                         request.getCreatedAt()
                 ))
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<SentFriendRequestResponse> getSentRequests(Long memberId) {
+        Member requester = findMember(memberId);
+
+        return friendRequestRepository
+                .findAllByRequesterAndStatusOrderByCreatedAtDesc(
+                        requester, FriendRequestStatus.PENDING
+                )
+                .stream()
+                .map(request -> {
+                    Member receiver = request.getReceiver();
+                    return new SentFriendRequestResponse(
+                            request.getRequestId(),
+                            receiver.getMemberId(),
+                            receiver.getNickname(),
+                            receiver.getProfileImageUrl(),
+                            request.getCreatedAt()
+                    );
+                })
                 .toList();
     }
 

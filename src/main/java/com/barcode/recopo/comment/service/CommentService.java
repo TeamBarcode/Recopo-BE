@@ -20,6 +20,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -43,22 +45,43 @@ public class CommentService {
         Idea idea=ideaRepository.findById(ideaId).orElseThrow(()->
                 new CustomException(ErrorCode.IDEA_NOT_FOUND));
 
-        Comment comment=Comment.create(
-                request.content(),
-                member,
-                idea
-        );
+        Comment parent = null;
+        Comment comment;
+        if (request.parentCommentId() == null) {
+            comment = Comment.create(request.content(), member, idea);
+        } else {
+            parent = commentRepository
+                    .findByCommentIdAndDeletedFalse(request.parentCommentId())
+                    .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
+
+            if (!parent.getIdea().getIdeaId().equals(ideaId)) {
+                throw new CustomException(ErrorCode.COMMENT_NOT_FOUND);
+            }
+
+            if (parent.getParentCommentId() != null) {
+                throw new CustomException(ErrorCode.BAD_REQUEST);
+            }
+
+            comment = Comment.createReply(request.content(), member, parent);
+        }
         commentRepository.save(comment);
 
-        //타 사용자의 아이디어에 댓글을 달았을 때만 알림 생성
-        //자신이 자신의 아이디어에 댓글들 달 경우 알림 생성하지 않음
-        if (!idea.getMember().getMemberId().equals(memberId)){
-            Notification notification=Notification.create(
-                    NotificationType.COMMENT,
-                    member.getNickname()+"님이 회원님의 아이디어에 댓글을 남겼습니다.",
+        Member receiver = parent == null ? idea.getMember() : parent.getMember();
+
+        if (!receiver.getMemberId().equals(memberId)) {
+            NotificationType type = parent == null
+                    ? NotificationType.COMMENT
+                    : NotificationType.REPLY;
+            String message = parent == null
+                    ? member.getNickname() + "님이 회원님의 아이디어에 댓글을 남겼습니다."
+                    : member.getNickname() + "님이 회원님의 댓글에 답글을 남겼습니다.";
+
+            Notification notification = Notification.create(
+                    type,
+                    message,
                     idea.getIdeaId(),
                     NotificationTargetType.IDEA,
-                    idea.getMember(),
+                    receiver,
                     member
             );
             notificationRepository.save(notification);
@@ -70,24 +93,36 @@ public class CommentService {
                 member.getProfileImageUrl(),
                 comment.getContent(),
                 comment.getCreatedAt(),
-                comment.getUpdatedAt()
+                comment.getUpdatedAt(),
+                comment.getParentCommentId()
         );
     }
     public List<CommentResponse> getComments(Long ideaId){
         Idea idea=ideaRepository.findById(ideaId).orElseThrow(()->
                 new CustomException(ErrorCode.IDEA_NOT_FOUND));
 
-        return commentRepository.findAllByIdeaAndDeletedFalseOrderByCreatedAtAsc(idea)
-                .stream()
-                .map(comment->new CommentResponse(
+        List<Comment> comments = commentRepository
+                .findAllByIdeaAndDeletedFalseOrderByCreatedAtAsc(idea);
+
+        Set<Long> visibleParentIds = comments.stream()
+                .filter(comment -> comment.getParentCommentId() == null)
+                .map(Comment::getCommentId)
+                .collect(Collectors.toSet());
+
+        return comments.stream()
+                .filter(comment -> comment.getParentCommentId() == null
+                        || visibleParentIds.contains(comment.getParentCommentId()))
+                .map(comment -> new CommentResponse(
                         comment.getCommentId(),
                         comment.getMember().getMemberId(),
                         comment.getMember().getNickname(),
                         comment.getMember().getProfileImageUrl(),
                         comment.getContent(),
                         comment.getCreatedAt(),
-                        comment.getUpdatedAt()
-                )).toList();
+                        comment.getUpdatedAt(),
+                        comment.getParentCommentId()
+                ))
+                .toList();
     }
 
     @Transactional
@@ -112,7 +147,8 @@ public class CommentService {
                 comment.getMember().getProfileImageUrl(),
                 comment.getContent(),
                 comment.getCreatedAt(),
-                comment.getUpdatedAt()
+                comment.getUpdatedAt(),
+                comment.getParentCommentId()
         );
     }
 

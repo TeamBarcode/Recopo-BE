@@ -35,7 +35,7 @@ public class IdeaService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public void saveAsIdea(Long cardId, Long memberId, IdeaRequestDto.Save requestDto) {
+    public Long saveAsIdea(Long cardId, Long memberId, IdeaRequestDto.Save requestDto) {
         Card card = cardRepository.findById(cardId)
                 .orElseThrow(() -> new CustomException(ErrorCode.CARD_NOT_FOUND));
 

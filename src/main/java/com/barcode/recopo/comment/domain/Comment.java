@@ -35,6 +35,9 @@ public class Comment {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "parent_comment_id")
+    private Long parentCommentId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
@@ -53,6 +56,12 @@ public class Comment {
 
     public static Comment create(String content, Member member, Idea idea) {
         return new Comment(content, member, idea);
+    }
+
+    public static Comment createReply(String content, Member member, Comment parent) {
+        Comment reply = create(content, member, parent.getIdea());
+        reply.parentCommentId = parent.getCommentId();
+        return reply;
     }
 
     public void update(String content) {

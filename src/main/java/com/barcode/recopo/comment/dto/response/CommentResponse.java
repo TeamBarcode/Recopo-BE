@@ -9,6 +9,7 @@ public record CommentResponse(
         String profileImageUrl,
         String content,
         LocalDateTime createdAt,
-        LocalDateTime updatedAt
+        LocalDateTime updatedAt,
+        Long parentCommentId
 ) {
 }

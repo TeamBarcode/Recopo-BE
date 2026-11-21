@@ -3,6 +3,7 @@ package com.barcode.recopo.friend.controller;
 import com.barcode.recopo.friend.dto.request.FriendRequestCreateRequest;
 import com.barcode.recopo.friend.dto.response.FriendRequestResponse;
 import com.barcode.recopo.friend.dto.response.FriendResponse;
+import com.barcode.recopo.friend.dto.response.SentFriendRequestResponse;
 import com.barcode.recopo.friend.service.FriendService;
 import com.barcode.recopo.idea.dto.IdeaResponseDto;
 import jakarta.validation.Valid;
@@ -33,6 +34,13 @@ public class FriendController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .build();
+    }
+
+    @GetMapping("/requests/sent")
+    public ResponseEntity<List<SentFriendRequestResponse>> getSentRequests(
+            @AuthenticationPrincipal Long memberId
+    ) {
+        return ResponseEntity.ok(friendService.getSentRequests(memberId));
     }
 
     @GetMapping("/requests/received")
